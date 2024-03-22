@@ -12,7 +12,20 @@ $(document).on('click', function (event) {
         $('#modal_right').empty();
     }
 });
+/*********
+$('#modal_right').on('click', 'button', function (e) {
+    let aniPk;
+    let score;
+    let content;
 
+    // anipk, score, content 구하기
+    aniPk = '743927e1-1c03-40f9-a524-f3f51c2c31f6';
+    score = '5';
+    content = '후기!!';
+
+    writeCompleteComment(aniPk, score, content);
+});
+ ***********/
 function detailModalAniInfo(aniPk) {
     $.ajax({
         url: 'DetailInfo/ani_detail?aniPk=' + aniPk,
@@ -70,7 +83,7 @@ function detailModalAniInfo(aniPk) {
                         </tr>
                         ${commentHtml}
                     </table>
-                    <button id="write_cmt" onclick="writeComment()">댓글 쓰기</button>
+                    <button id="write_cmt" onclick="showWriteComment()">댓글 쓰기</button>
                     </fieldset>
                     <fieldset id="commentWrite">평가 작성하기
                         <div id="comment_info">
@@ -83,7 +96,7 @@ function detailModalAniInfo(aniPk) {
                             </div>
                         </div>
                         <textarea id="comment_context" placeholder="평가를 남겨주세요"></textarea>
-                        <button type="submit" onclick="writeCompleteComment()">댓글 등록</button>
+                        <button type="button" onclick="writeCompleteComment()">댓글 등록</button>
                     </fieldset>`
                     // `<td id="comment_day">${data.commentDate}</td>` +
                     // `<td id="comment_id">${data.commentId}</td>` +
@@ -95,26 +108,22 @@ function detailModalAniInfo(aniPk) {
     });
 }
 
-function writeComment() {
+function showWriteComment() {
     const commentOpen = document.querySelector("#commentWrite");
     commentOpen.style.visibility = 'visible';
-   
-
-    
 }
 
-function writeCompleteComment() {
+function writeCompleteComment(aniPk, score, comment) {
+    // console.log(aniPk);
+    // console.log(score);
+    // console.log(comment);
     $.ajax({
         url: 'DetailInfo/insertComment',
-        type: 'post',
-        contentType: 'application/json',
-        dataType: 'json',
+        type: 'POST',
         data: {
             aniPk: aniPk,
-            id:id,
-            score: score,
-            comment: comment            
-            
+            initGrade: score,
+            content: comment            
         },
         error: function (error, status, msg) {
             alert("상태코드 " + status + " 에러메시지 " + msg);

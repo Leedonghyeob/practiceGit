@@ -2,11 +2,14 @@ package anime_list.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
+
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -14,6 +17,8 @@ import com.google.gson.GsonBuilder;
 import anime_list.model.dto.DetailModalDto;
 import anime_list.model.vo.AniList;
 import anime_list.model.vo.Comment;
+import anime_list.model.vo.User;
+import anime_list.service.CommentService;
 import anime_list.service.DetailModalService;
 
 
@@ -24,6 +29,7 @@ public class DetailModalController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/plain; charset=UTF-8");
         String pathInfo = request.getPathInfo();
+        HttpSession session = request.getSession();
 
         if(pathInfo == null || pathInfo.equals("/")) {
             response.sendRedirect(request.getContextPath()+"/error");
@@ -48,13 +54,35 @@ public class DetailModalController extends HttpServlet {
 
             response.getWriter().write(json);
         } else if(pathInfo.equals("/insertComment")) {
+
+            request.setCharacterEncoding("utf-8");
+
+            String commentPk = UUID.randomUUID().toString();
+            String userPk = ((User) session.getAttribute("loginUser")).getUserPk();
+            // User loginUser = (User) session.getAttribute("loginUser");
+            // String userPk = loginUser.getUserPk();
             String aniPk = request.getParameter("aniPk");
+            String content = request.getParameter("content");
+            System.out.println("-----------------------------------");
+            System.out.println(request.getParameter("initGrade"));
+            System.out.println("-----------------------------------");
+            float initGrade = Float.parseFloat(request.getParameter("initGrade"));
+
+            CommentService commentservice = new CommentService();
             
-
-
+            int result = commentservice.insertComment(commentPk, userPk, aniPk, content, initGrade);
+            
+            // 8
+            Gson gson = new Gson();
+            String json = gson.toJson(result);
+            response.getWriter().write(json);
         } else  {
             response.sendRedirect(request.getContextPath()+"/error");
         }
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        doGet(request, response);
     }
 }
     
